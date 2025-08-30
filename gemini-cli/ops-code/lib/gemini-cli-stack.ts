@@ -13,7 +13,7 @@ export class OpsCodeStack extends cdk.Stack {
     });
     const cluster = new ecs.Cluster(this, 'EcsCluster', {
       vpc,
-      clusterName: 'amazon-q-cluster',
+      clusterName: 'gemini-cli-cluster',
       capacity: {
         instanceType: new ec2.InstanceType('t4g.medium'),
         minCapacity: 1,
@@ -22,12 +22,12 @@ export class OpsCodeStack extends cdk.Stack {
     });
 
     const taskDefinition = new ecs.Ec2TaskDefinition(this, 'TaskDef', {
-        family: 'amazon-q-task-def',
+        family: 'gemini-cli-task-def',
         networkMode: ecs.NetworkMode.AWS_VPC,
       });
 
       const logGroup = new logs.LogGroup(this, 'LogGroup', {
-      logGroupName: 'amazon-q-log-group',
+      logGroupName: 'gemini-cli-log-group',
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
       taskDefinition.addContainer('AppContainer', {
