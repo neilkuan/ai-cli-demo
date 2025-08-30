@@ -18,6 +18,7 @@ export class OpsCodeStack extends cdk.Stack {
         instanceType: new ec2.InstanceType('t4g.medium'),
         minCapacity: 1,
         maxCapacity: 3,
+        machineImage: ecs.EcsOptimizedImage.amazonLinux2(ecs.AmiHardwareType.ARM) ,
       },
     });
 
