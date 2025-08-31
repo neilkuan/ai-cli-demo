@@ -1,6 +1,6 @@
 # High Memory Server
 
-This Go server allocates a large amount of memory at regular intervals to simulate high memory usage. By default, it allocates 600 MiB every 5 seconds, but you can adjust the allocation size using the `MEMORY_SET` environment variable.
+This Go server allocates a large amount of memory at regular intervals to simulate high memory usage. By default, it allocates 500 MiB every 5 seconds, but you can adjust the allocation size using the `MEMORY_SET` environment variable.
 
 - The server exposes a `/status` endpoint to report the current memory usage.
 - On startup, it checks the container's memory limit and warns if the allocation size exceeds the available memory.

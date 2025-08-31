@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"runtime"
 	"strconv"
 	"strings"
 	"sync"
@@ -13,7 +14,7 @@ import (
 var (
 	memorySlices [][]byte
 	mu           sync.Mutex
-	memorySetMiB int64 = 600 // 預設 600 MiB
+	memorySetMiB int64 = 500 // 預設 500 MiB
 )
 
 // 取得 container 記憶體限制（支援 cgroup v1/v2）
@@ -53,12 +54,12 @@ func printContainerResourcesAndCheck(memorySetMiB int64) int64 {
 func getMemorySetFromEnv() int64 {
 	memStr := os.Getenv("MEMORY_SET")
 	if memStr == "" {
-		return 600
+		return 500
 	}
 	memVal, err := strconv.ParseInt(memStr, 10, 64)
 	if err != nil || memVal <= 0 {
-		fmt.Printf("Invalid MEMORY_SET env value: %s, fallback to 600 MiB\n", memStr)
-		return 600
+		fmt.Printf("Invalid MEMORY_SET env value: %s, fallback to 500 MiB\n", memStr)
+		return 500
 	}
 	return memVal
 }
@@ -78,7 +79,6 @@ func main() {
 			}
 		}()
 		for {
-
 			for i := 0; i < 11; i++ {
 				time.Sleep(1 * time.Second)
 				fmt.Printf("%d...", i)
@@ -93,6 +93,18 @@ func main() {
 			memorySlices = append(memorySlices, mem)
 			fmt.Printf("Allocated %d MiB, total allocations: %d\n", memorySetMiB, len(memorySlices))
 			mu.Unlock()
+
+			go func() {
+				mu.Lock()
+				if len(memorySlices) > 0 {
+					memorySlices = memorySlices[1:]
+					fmt.Println("Released 1 allocation, total allocations:", len(memorySlices))
+				}
+				mu.Unlock()
+
+				runtime.GC()
+			}()
+
 			time.Sleep(5 * time.Second)
 		}
 	}()
