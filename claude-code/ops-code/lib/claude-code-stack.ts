@@ -32,7 +32,7 @@ export class OpsCodeStack extends cdk.Stack {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
       taskDefinition.addContainer('AppContainer', {
-        image: ecs.ContainerImage.fromRegistry('ghcr.io/neilkuan/ai-cli-demo:high-memory-server-v1'),
+        image: ecs.ContainerImage.fromRegistry('ghcr.io/neilkuan/ai-cli-demo:high-memory-server-v2'),
         memoryLimitMiB: 512,
         cpu: 256,
         logging: new ecs.AwsLogDriver({
