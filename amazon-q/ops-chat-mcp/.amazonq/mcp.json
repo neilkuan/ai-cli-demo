@@ -1,0 +1,51 @@
+{
+    "mcpServers": {
+        "awslabs.core-mcp-server": {
+            "command": "/Users/neil.kuan/.local/bin/uvx",
+            "args": [
+                "awslabs.core-mcp-server@1.0.0"
+            ],
+            "env": {
+                "FASTMCP_LOG_LEVEL": "ERROR"
+            },
+            "autoApprove": [],
+            "disabled": false
+        },
+        "aws-knowledge-mcp-server": {
+            "command": "npx",
+            "args": [
+                "mcp-remote",
+                "https://knowledge-mcp.global.api.aws"
+            ]
+        },
+        "awslabs.cloudwatch-mcp-server": {
+            "autoApprove": [],
+            "disabled": false,
+            "timeout": 60,
+            "command": "/Users/neil.kuan/.local/bin/uvx",
+            "args": [
+                "awslabs.cloudwatch-mcp-server@latest"
+            ],
+            "env": {
+                "AWS_PROFILE": "neil",
+                "FASTMCP_LOG_LEVEL": "ERROR"
+            },
+            "transportType": "stdio"
+        },
+        "awslabs.cloudwatch-logs-mcp-server": {
+            "autoApprove": [],
+            "disabled": false,
+            "timeout": 60,
+            "command": "/Users/neil.kuan/.local/bin/uvx",
+            "args": [
+                "awslabs.cloudwatch-logs-mcp-server@0.0.7"
+            ],
+            "env": {
+                "AWS_PROFILE": "neil",
+                "AWS_REGION": "ap-east-2",
+                "FASTMCP_LOG_LEVEL": "ERROR"
+            },
+            "transportType": "stdio"
+        }
+    }
+}

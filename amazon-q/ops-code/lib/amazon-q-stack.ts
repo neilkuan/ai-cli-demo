@@ -3,6 +3,7 @@ import { Construct } from 'constructs';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as logs from 'aws-cdk-lib/aws-logs';
+import * as lambda from 'aws-cdk-lib/aws-lambda';
 
 export class OpsCodeStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -45,8 +46,26 @@ export class OpsCodeStack extends cdk.Stack {
       taskDefinition,
     });
 
+    const fn = new lambda.Function(this, 'Lambda', {
+        functionName: 'amazon-q-lambda',
+        runtime: lambda.Runtime.PYTHON_3_13,
+        handler: 'index.handler',
+        logGroup: new logs.LogGroup(this, 'LambdaLog', { logGroupName: 'amazon-q-lambda', removalPolicy: cdk.RemovalPolicy.DESTROY}),
+        code: new lambda.InlineCode(`
+import time
+
+def handler(event, contexts):
+    print('Start to sleep 4s...')
+    time.sleep(4)
+    print('Done')
+`)
+    })
+
     new cdk.CfnOutput(this, 'ClusterName', {
       value: cluster.clusterName
+    });
+    new cdk.CfnOutput(this, 'LambdaName', {
+      value: fn.functionName
     });
   }
 }

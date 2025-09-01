@@ -1,0 +1,16 @@
+{
+    "mcpServers": {
+        "awslabs.aws-api-mcp-server": {
+            "command": "/Users/neil.kuan/.local/bin/uvx",
+            "args": [
+                "awslabs.aws-api-mcp-server@0.2.10"
+            ],
+            "env": {
+                "AWS_REGION": "ap-east-2",
+                "AWS_PROFILE": "neil"
+            },
+            "disabled": false,
+            "autoApprove": []
+        }
+    }
+}

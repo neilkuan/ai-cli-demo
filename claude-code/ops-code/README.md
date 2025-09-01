@@ -17,10 +17,10 @@ The `cdk.json` file tells the CDK Toolkit how to execute your app.
 
 ## To deploy
 ```bash
-npx aws-cdk deploy --require-approval never
+npx aws-cdk deploy --no-notices --require-approval never --profile $AWS_PROFILE --region ap-east-2
 ```
 
 ## To Destroy
 ```bash
-npx aws-cdk destroy --require-approval never
+npx aws-cdk destroy --no-notices --require-approval never --profile $AWS_PROFILE --region ap-east-2
 ```
