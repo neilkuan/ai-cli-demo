@@ -54,7 +54,7 @@ export class OpsCodeStack extends cdk.Stack {
         code: new lambda.InlineCode(`
 import time
 
-def handler(event, contexts):
+def handler(event, context):
     print('Start to sleep 4s...')
     time.sleep(4)
     print('Done')

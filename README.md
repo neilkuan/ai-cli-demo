@@ -24,7 +24,7 @@
 - docs: [https://google-gemini.github.io/gemini-cli/](https://google-gemini.github.io/gemini-cli/)
 
 ### Quick Comparison
-
+open: https://blog.neilkuan.click/ai-cli-demo/assets/index.html
 ```bash
 open ./assets/index.html
 ```
