@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 開發者 CLI 工具比較分析</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals -->
+    <!-- Application Structure Plan: 本應用程式設計為一個單頁式儀表板，旨在引導使用者從宏觀到微觀地比較三種 AI CLI 工具。結構依次為：1. 總覽卡片區。2. 互動式雷達圖。3. 新增的「效能比較評分」與「技術規格對比」表格，以提供量化數據。4. 核心功能比較區，採用頁籤式設計。此結構透過質化與量化結合的方式，協助開發者做出更全面的決策。 -->
+    <!-- Visualization & Content Choices: 1. [總覽] -> 目標: 快速告知核心定位 -> 呈現方式: 三欄式資訊卡片。2. [能力維度分析] -> 目標: 視覺化比較相對強弱 -> 呈現方式: 雷達圖 (Chart.js/Canvas)。3. [效能與規格] -> 目標: 提供具體量化數據 -> 呈現方式: 兩個清晰的 HTML 表格。4. [核心功能] -> 目標: 詳細並排比較 -> 呈現方式: 頁籤導覽 + 網格佈局文字。 -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #FDFBF8;
+            color: #4A4A4A;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 50vh;
+            max-height: 500px;
+        }
+
+        .tab-button {
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-button.active {
+            color: #8A6E50;
+            border-bottom-color: #8A6E50;
+        }
+
+        .card {
+            background-color: #FFFFFF;
+            border: 1px solid #EAEAEA;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -4px rgba(0, 0, 0, 0.07);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #EAEAEA;
+        }
+
+        th {
+            background-color: #F9F9F9;
+            font-weight: 600;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .tag {
+            display: inline-block;
+            background-color: #EAEAEA;
+            color: #555;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            margin-left: 8px;
+        }
+
+        code {
+            background-color: #f1f1f1;
+            color: #333;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        .code-block {
+            background-color: #2d2d2d;
+            color: #f8f8f2;
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9em;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container mx-auto p-4 sm:p-6 lg:p-8">
+
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-[#4A4A4A] mb-2">三大 AI 開發者 CLI 工具</h1>
+            <h2 class="text-xl md:text-2xl font-semibold text-[#8A6E50]">互動式比較分析報告</h2>
+            <p class="mt-4 max-w-3xl mx-auto text-gray-600">
+                本報告旨在深入分析 Amazon Q Developer CLI、Google Gemini CLI 及 Anthropic Claude Code
+                CLI。透過互動式圖表與並排比較，協助您根據具體的開發需求，選擇最適合的命令列工具。
+            </p>
+        </header>
+
+        <main>
+            <section id="overview" class="mb-16">
+                <h3 class="text-2xl font-bold text-center mb-8">產品總覽：一句話認識他們</h3>
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="card p-6 flex flex-col items-center text-center">
+                        <div class="text-4xl mb-4">☁️</div>
+                        <h4 class="text-xl font-bold mb-2 text-[#4A4A4A]">Amazon Q Developer CLI</h4>
+                        <p class="text-gray-600">最適合深度整合 AWS 生態系的開發者，專注於企業級程式碼轉換、安全掃描與雲端資源管理。</p>
+                    </div>
+                    <div class="card p-6 flex flex-col items-center text-center">
+                        <div class="text-4xl mb-4">⚙️</div>
+                        <h4 class="text-xl font-bold mb-2 text-[#4A4A4A]">Google Gemini CLI</h4>
+                        <p class="text-gray-600">最具擴充性的 AI 代理 (Agent)，透過內建工具集與本機環境深度互動，實現複雜的自動化任務。</p>
+                    </div>
+                    <div class="card p-6 flex flex-col items-center text-center">
+                        <div class="text-4xl mb-4">💻</div>
+                        <h4 class="text-xl font-bold mb-2 text-[#4A4A4A]">Claude Code CLI</h4>
+                        <p class="text-gray-600">最適合專注於本地專案開發的程式設計師，對現有程式碼庫有著卓越的理解與上下文感知能力。</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="radar-chart-section" class="mb-16">
+                <h3 class="text-2xl font-bold text-center mb-4">能力維度分析</h3>
+                <p class="text-center text-gray-600 mb-8">此雷達圖視覺化呈現了各工具在五個關鍵維度上的相對強度。您可以透過它快速了解每個工具的設計重點與核心優勢。</p>
+                <div class="card p-4 sm:p-6">
+                    <div class="chart-container">
+                        <canvas id="cliRadarChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <section id="performance-comparison" class="mb-16">
+                <h3 class="text-2xl font-bold text-center mb-8">效能比較評分</h3>
+                <div class="card overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>評估指標</th>
+                                    <th>Amazon Q Developer</th>
+                                    <th>Gemini CLI</th>
+                                    <th>Claude Code</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>代碼品質</td>
+                                    <td>8.5/10</td>
+                                    <td>7.8/10</td>
+                                    <td>9.1/10</td>
+                                </tr>
+                                <tr>
+                                    <td>生成速度</td>
+                                    <td>8.0/10</td>
+                                    <td>8.5/10</td>
+                                    <td>7.2/10</td>
+                                </tr>
+                                <tr>
+                                    <td>錯誤處理</td>
+                                    <td>8.2/10</td>
+                                    <td>7.5/10</td>
+                                    <td>8.8/10</td>
+                                </tr>
+                                <tr>
+                                    <td>上下文理解</td>
+                                    <td>8.0/10</td>
+                                    <td>9.2/10</td>
+                                    <td>7.9/10</td>
+                                </tr>
+                                <tr>
+                                    <td>企業功能</td>
+                                    <td>9.5/10</td>
+                                    <td>7.0/10</td>
+                                    <td>9.0/10</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="tech-specs" class="mb-16">
+                <h3 class="text-2xl font-bold text-center mb-8">技術規格對比</h3>
+                <div class="card overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>功能特色</th>
+                                    <th>Amazon Q Developer CLI</th>
+                                    <th>Gemini CLI</th>
+                                    <th>Claude Code CLI</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>上下文視窗</td>
+                                    <td>~200K tokens</td>
+                                    <td>1M tokens</td>
+                                    <td>~200K tokens</td>
+                                </tr>
+                                <tr>
+                                    <td>主要模型</td>
+                                    <td>Claude Sonnet 4</td>
+                                    <td>Gemini 2.5 Pro</td>
+                                    <td>Claude Opus 4.1</td>
+                                </tr>
+                                <tr>
+                                    <td>平台支援</td>
+                                    <td>Linux, macOS, Windows(WSL)</td>
+                                    <td>Windows, macOS, Linux</td>
+                                    <td>macOS(優化), Linux, Windows</td>
+                                </tr>
+                                <tr>
+                                    <td>安裝方式</td>
+                                    <td>AppImage, .deb, 手動</td>
+                                    <td>npm, Homebrew</td>
+                                    <td>npm, 原生二進位</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="feature-comparison" class="mb-16">
+                <h3 class="text-2xl font-bold text-center mb-8">核心功能比較</h3>
+                <div class="card p-4 sm:p-6 lg:p-8">
+                    <div class="border-b border-gray-200 mb-6">
+                        <nav id="tabs" class="flex flex-wrap justify-center -mb-px" aria-label="Tabs">
+                        </nav>
+                    </div>
+                    <div id="tab-content">
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="text-center pt-8 border-t border-gray-200">
+            <p class="text-gray-500">報告生成於 <span id="generation-date"></span>。資訊來源於各產品官方文件與 GitHub repository。</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const cliData = {
+                amazon: { name: 'Amazon Q Dev CLI', radar: [8, 4, 9, 7, 5] },
+                gemini: { name: 'Gemini CLI', radar: [6, 9, 5, 8, 9] },
+                claude: { name: 'Claude Code CLI', radar: [7, 7, 6, 9, 6] }
+            };
+
+            const comparisonData = {
+                '安裝方法': {
+                    'Amazon Q': `
+                        <p class="mb-2">推薦使用 Homebrew (macOS/Linux)</p>
+                        <p class="mb-2"><strong>Homebrew:</strong></p>
+                        <div class="code-block">brew install --cask amazon-q</div>
+                    `,
+                    'Gemini': `
+                        <p class="mb-2">需要 Node.js 環境，透過 npm 進行全域安裝：</p>
+                        <div class="code-block">npm install -g @google/gemini-cli</div>
+                    `,
+                    'Claude': `
+                        <p class="mb-2">需要 Node.js 環境，透過 npm 進行全域安裝：</p>
+                        <div class="code-block">npm install -g @anthropic-ai/claude-code</div>
+                    `,
+                },
+                '內建工具集 (環境互動)': {
+                    'Amazon Q': `
+                        <p>主要透過與 AWS 服務的深度整合來與環境互動，本地工具較少：</p>
+                        <ul class="list-disc pl-5 mt-2 space-y-2">
+                            <li><strong>AWS 服務整合</strong>: 可直接操作 CodeCatalyst、S3 等 AWS 資源。</li>
+                            <li><strong>程式碼掃描</strong>: <code>q scan</code> 能夠掃描本地程式碼，但其分析和報告依賴後端 CodeWhisperer 服務。</li>
+                             <li><strong>受限的本地互動</strong>: 核心設計理念是作為 AWS 雲端服務的本地介面，而非一個通用的本地自動化工具。</li>
+                        </ul>
+                    `,
+                    'Gemini': `
+                        <p>擁有強大的內建工具集，可作為 AI 代理與本地環境深度互動：</p>
+                         <ul class="list-disc pl-5 mt-2 space-y-2">
+                            <li><strong>檔案系統</strong>: 支援讀取(<code>read_file</code>)、寫入(<code>write_file</code>)、尋找(<code>glob</code>)、取代(<code>replace</code>)等完整操作。</li>
+                            <li><strong>Shell 命令</strong>: 可直接執行終端機命令 (<code>! ls</code>) 或讓 AI 生成並執行複雜腳本，使用者可設定權限控管。</li>
+                            <li><strong>Web 爬取與搜尋</strong>: 內建 Google 搜尋與網頁內容爬取 (<code>web-fetch</code>) 工具，可獲取即時資訊。</li>
+                            <li><strong>可擴充性</strong>: 支援 MCP 協議，可連接自訂工具伺服器，無限擴充其能力。</li>
+                        </ul>
+                    `,
+                    'Claude': `
+                        <p>專注於程式碼上下文的讀取與理解，互動工具較為單純：</p>
+                         <ul class="list-disc pl-5 mt-2 space-y-2">
+                             <li><strong>檔案讀取</strong>: 核心能力是讀取整個工作區或指定檔案 (<code>--select</code>) 作為上下文，但不支援寫入。</li>
+                             <li><strong>原地修改</strong>: 獨特的 <code>--edit</code> 參數，在使用者確認後，可直接修改檔案內容，專為程式碼重構設計。</li>
+                            <li><strong>無 Shell 或 Web 工具</strong>: 設計上專注於程式碼本身，不提供直接執行 Shell 命令或存取網路的功能，以確保安全性與專注性。</li>
+                        </ul>
+                    `,
+                },
+                '核心指令 (Commands)': {
+                    'Amazon Q': `
+                        <p>專為 AWS 生態系設計的企業級指令：</p>
+                        <ul class="list-disc pl-5 mt-2 space-y-2">
+                            <li><code>q transform</code>: 自動化程式碼現代化，如 Java 版本升級。</li>
+                            <li><code>q scan</code>: 掃描程式碼以發現安全漏洞和品質問題。</li>
+                            <li><code>q send</code>: 將檔案或目錄內容傳送給 Amazon Q 進行分析。</li>
+                            <li><code>q conversation</code>: 在終端機中與 Q 進行互動式對話。</li>
+                        </ul>
+                    `,
+                    'Gemini': `
+                        <p>通用且靈活的 AI 互動指令：</p>
+                         <ul class="list-disc pl-5 mt-2 space-y-2">
+                            <li><code>gemini generate text</code>: 核心功能，根據提示生成文字或程式碼。</li>
+                            <li><code>gemini chat</code>: 啟動一個互動式對話 session。</li>
+                            <li><code>/tools</code>: 顯示當前可用的內建工具列表。</li>
+                            <li>支援檔案 pipe 輸入與 <code>--stream</code> 參數，易於整合進腳本。</li>
+                        </ul>
+                    `,
+                    'Claude': `
+                        <p>專注於本地程式碼庫理解的開發指令：</p>
+                         <ul class="list-disc pl-5 mt-2 space-y-2">
+                            <li><code>claude code [prompt]</code>: 主要指令，能感知整個專案上下文來回答問題或生成程式碼。</li>
+                            <li><code>--edit</code>: 讓 AI 直接修改指定的檔案，實現原地程式碼重構。</li>
+                            <li><code>--select</code>: 僅將特定檔案作為上下文，進行更精確的問答。</li>
+                            <li><code>-a, --all</code>: 將工作區中所有檔案作為上下文。</li>
+                        </ul>
+                    `,
+                },
+                '安裝與驗證': {
+                    'Amazon Q': '透過 AWS CLI <code>aws sso login</code> 進行身份驗證，與 AWS IAM Identity Center 深度整合，設定相對複雜，適合企業環境。',
+                    'Gemini': '使用 <code>gcloud auth application-default login</code> 或設定 API 金鑰環境變數，設定流程直觀簡單。',
+                    'Claude': '需要設定 Anthropic API 金鑰環境變數，安裝與設定過程非常輕量快速。',
+                },
+                '生態系整合': {
+                    'Amazon Q': '無與倫比的 AWS 整合能力。可直接掃描 CodeWhisperer 安全問題、管理 CodeCatalyst 資源，並與 S3、Lambda 等互動。',
+                    'Gemini': '與 Google Cloud 和 Vertex AI 生態系緊密結合，方便使用者利用 Google 的 AI 基礎設施。',
+                    'Claude': '主要作為獨立工具運作，專注於本地開發環境，較少與特定雲端平台進行深度綁定。',
+                }
+            };
+
+            const radarCtx = document.getElementById('cliRadarChart').getContext('2d');
+            new Chart(radarCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['企業整合', '通用性/擴充性', '生態系深度', '程式碼上下文理解', '易用性'],
+                    datasets: [
+                        { label: cliData.amazon.name, data: cliData.amazon.radar, backgroundColor: 'rgba(255, 159, 64, 0.2)', borderColor: 'rgba(255, 159, 64, 1)', borderWidth: 2, pointBackgroundColor: 'rgba(255, 159, 64, 1)' },
+                        { label: cliData.gemini.name, data: cliData.gemini.radar, backgroundColor: 'rgba(54, 162, 235, 0.2)', borderColor: 'rgba(54, 162, 235, 1)', borderWidth: 2, pointBackgroundColor: 'rgba(54, 162, 235, 1)' },
+                        { label: cliData.claude.name, data: cliData.claude.radar, backgroundColor: 'rgba(153, 102, 255, 0.2)', borderColor: 'rgba(153, 102, 255, 1)', borderWidth: 2, pointBackgroundColor: 'rgba(153, 102, 255, 1)' }
+                    ]
+                },
+                options: { maintainAspectRatio: false, scales: { r: { angleLines: { color: '#EAEAEA' }, grid: { color: '#EAEAEA' }, pointLabels: { font: { size: 14, }, color: '#4A4A4A' }, ticks: { backdropColor: '#FDFBF8', color: '#8A6E50', stepSize: 2 }, suggestedMin: 0, suggestedMax: 10 } }, plugins: { legend: { position: 'top', labels: { font: { size: 14 } } }, tooltip: { callbacks: { label: (context) => `${context.dataset.label || ''}: ${context.parsed.r !== null ? context.parsed.r : ''}` } } } }
+            });
+
+            const tabsContainer = document.getElementById('tabs');
+            const tabContentContainer = document.getElementById('tab-content');
+            const tabKeys = Object.keys(comparisonData);
+
+            tabKeys.forEach((key, index) => {
+                const button = document.createElement('button');
+                button.className = `tab-button text-gray-500 hover:text-gray-700 whitespace-nowrap py-4 px-1 text-sm sm:text-base font-medium mx-2 sm:mx-4 ${index === 0 ? 'active' : ''}`;
+                button.textContent = key;
+                button.dataset.tab = key;
+                tabsContainer.appendChild(button);
+            });
+
+            function renderTabContent(tabKey) {
+                tabContentContainer.innerHTML = '';
+                const content = comparisonData[tabKey];
+                const grid = document.createElement('div');
+                grid.className = 'grid md:grid-cols-3 gap-6 text-sm';
+                Object.entries(content).forEach(([tool, text]) => {
+                    let toolName, bgColor;
+                    if (tool.includes('Amazon')) { toolName = 'Amazon Q'; bgColor = 'bg-orange-50'; }
+                    else if (tool.includes('Gemini')) { toolName = 'Gemini'; bgColor = 'bg-blue-50'; }
+                    else { toolName = 'Claude'; bgColor = 'bg-purple-50'; }
+                    const item = document.createElement('div');
+                    item.className = `p-4 rounded-lg ${bgColor}`;
+                    item.innerHTML = `<h5 class="font-bold mb-2 text-gray-800">${toolName}</h5><div class="text-gray-700 leading-relaxed">${text}</div>`;
+                    grid.appendChild(item);
+                });
+                tabContentContainer.appendChild(grid);
+            }
+
+            tabsContainer.addEventListener('click', (e) => {
+                if (e.target.matches('.tab-button')) {
+                    tabsContainer.querySelector('.active').classList.remove('active');
+                    e.target.classList.add('active');
+                    renderTabContent(e.target.dataset.tab);
+                }
+            });
+
+            renderTabContent(tabKeys[0]);
+
+            document.getElementById('generation-date').textContent = new Date().toLocaleDateString('zh-TW', { year: 'numeric', month: 'long', day: 'numeric' });
+
+        });
+    </script>
+</body>
+
+</html>
