@@ -18,7 +18,7 @@ claude --allowedTools * --dangerously-skip-permissions
 ```
 
 ```
-根據 ../ops-chat/RECORD.ecs.md ，修復遇到的問題，當下資料夾為部署剛剛 ECS Cluster 的 CDK code 。
+根據 ../ops-chat/RECORD.ecs.md ，修復遇到的問題，當下資料夾為部署剛剛 ECS Cluster 的 CDK code， 修復過程記錄在 RECORD.ecs.fix.md。
 ```
 
 ### Invoke Lambda Function
@@ -40,6 +40,10 @@ claude --allowedTools * --dangerously-skip-permissions
 cd claude-code/ops-code
 claude --allowedTools * --dangerously-skip-permissions
 ```
+根據 ../ops-chat/RECORD.lambda.md，修復剛剛的問題，當下資料夾為部署剛剛 Lambda Function 的 CDK code ，修復過程記錄在 RECORD.lambda.fix.md。
 ```
-根據 ../ops-chat/RECORD.lambda.md，修復剛剛的問題，當下資料夾為部署剛剛 Lambda Function 的 CDK code ，如果要部署請告訴我。
+
+### Prompt 5.
+```
+根據  RECORD.lambda.fix.md 以及 RECORD.ecs.fix.md，原因過程結果發一個 PR 到 main branch 使用 github mcp。
 ```

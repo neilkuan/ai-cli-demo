@@ -33,7 +33,7 @@ export class OpsCodeStack extends cdk.Stack {
     });
       taskDefinition.addContainer('AppContainer', {
         image: ecs.ContainerImage.fromRegistry('ghcr.io/neilkuan/ai-cli-demo:high-memory-server-v2'),
-        memoryLimitMiB: 512,
+        memoryLimitMiB: 2048,
         cpu: 256,
         logging: new ecs.AwsLogDriver({
           streamPrefix: 'claude-code',
@@ -51,6 +51,7 @@ export class OpsCodeStack extends cdk.Stack {
         functionName: 'claude-code-lambda',
         runtime: lambda.Runtime.PYTHON_3_13,
         handler: 'index.handler',
+        timeout: cdk.Duration.seconds(10),
         logGroup: new logs.LogGroup(this, 'LambdaLog', { logGroupName: 'claude-code-lambda', removalPolicy: cdk.RemovalPolicy.DESTROY}),
         code: new lambda.InlineCode(`
 import time
