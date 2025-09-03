@@ -34,7 +34,7 @@ export class OpsCodeStack extends cdk.Stack {
     });
       taskDefinition.addContainer('AppContainer', {
         image: ecs.ContainerImage.fromRegistry('ghcr.io/neilkuan/ai-cli-demo:high-memory-server-v2'),
-        memoryLimitMiB: 512,
+        memoryLimitMiB: 1024,
         cpu: 256,
         logging: new ecs.AwsLogDriver({
           streamPrefix: 'gemini-cli',
@@ -52,6 +52,7 @@ export class OpsCodeStack extends cdk.Stack {
         functionName: 'gemini-cli-lambda',
         runtime: lambda.Runtime.PYTHON_3_13,
         handler: 'index.handler',
+        timeout: cdk.Duration.seconds(10),
         logGroup: new logs.LogGroup(this, 'LambdaLog', { logGroupName: 'gemini-cli-lambda', removalPolicy: cdk.RemovalPolicy.DESTROY}),
         code: new lambda.InlineCode(`
 import time
