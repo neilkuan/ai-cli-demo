@@ -32,7 +32,7 @@ export class OpsCodeStack extends cdk.Stack {
     });
     taskDefinition.addContainer('AppContainer', {
         image: ecs.ContainerImage.fromRegistry('ghcr.io/neilkuan/ai-cli-demo:high-memory-server-v2'),
-        memoryLimitMiB: 512,
+        memoryLimitMiB: 1024,
         cpu: 256,
         logging: new ecs.AwsLogDriver({
           streamPrefix: 'amazon-q',
@@ -50,6 +50,7 @@ export class OpsCodeStack extends cdk.Stack {
         functionName: 'amazon-q-lambda',
         runtime: lambda.Runtime.PYTHON_3_13,
         handler: 'index.handler',
+        timeout: cdk.Duration.seconds(10),
         logGroup: new logs.LogGroup(this, 'LambdaLog', { logGroupName: 'amazon-q-lambda', removalPolicy: cdk.RemovalPolicy.DESTROY}),
         code: new lambda.InlineCode(`
 import time
@@ -58,6 +59,7 @@ def handler(event, context):
     print('Start to sleep 4s...')
     time.sleep(4)
     print('Done')
+    return {'statusCode': 200, 'body': 'Success'}
 `)
     })
 
